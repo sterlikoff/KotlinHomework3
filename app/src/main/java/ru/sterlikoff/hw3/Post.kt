@@ -4,25 +4,31 @@ open class Post(
 
     var title: String,
     var author: String,
-    var time: Int
+    var time: Int,
+    var likeCount: Int = 0,
+    var commentCount: Int = 0,
+    var rePostCount: Int = 0,
+    var lon: Double = 0.0,
+    var lat: Double = 0.0,
+    var videoUrl: String = ""
 
 ) {
 
-    var likeCount: Int = 0
-    var commentCount: Int = 0
-    var rePostCount: Int = 0
+    private var liked: Boolean = false
 
     fun like() {
-        likeCount++
+
+        if (liked) {
+            likeCount--
+        } else {
+            likeCount++
+        }
+
+        liked = !liked
+
     }
 
-    fun comment() {
-        commentCount++
-    }
-
-    fun rePost() {
-        rePostCount++
-    }
+    fun isLiked() = liked
 
     fun numericalWordForm(value: Long, form1: String, form2: String, form3: String): String {
 
