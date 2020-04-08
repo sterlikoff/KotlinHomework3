@@ -86,7 +86,13 @@ class PostAdapter(private var list: List<Item>, private val context: Context) :
         postHolder.title.text = post.title
         postHolder.date.text = post.getAgoString()
         postHolder.author.text = post.author
-        postHolder.likeCount.text = post.likeCount.toString()
+
+        if (post.likeCount == 0) {
+            postHolder.likeCount.visibility = View.INVISIBLE
+        } else {
+            postHolder.likeCount.text = post.likeCount.toString()
+        }
+
         postHolder.commentCount.text = post.commentCount.toString()
         postHolder.shareCount.text = post.rePostCount.toString()
 
@@ -117,6 +123,7 @@ class PostAdapter(private var list: List<Item>, private val context: Context) :
         postHolder.locationBtn.setOnClickListener {
 
             context.startActivity(Intent().apply {
+                this.action = Intent.ACTION_VIEW
                 this.data = Uri.parse("geo:${post.lat},${post.lon}")
             })
 
@@ -125,6 +132,7 @@ class PostAdapter(private var list: List<Item>, private val context: Context) :
         postHolder.videoBtn.setOnClickListener {
 
             context.startActivity(Intent().apply {
+                this.action = Intent.ACTION_VIEW
                 this.data = Uri.parse(post.videoUrl)
             })
 
@@ -145,6 +153,7 @@ class PostAdapter(private var list: List<Item>, private val context: Context) :
             postHolder.itemView.setOnClickListener {
 
                 context.startActivity(Intent().apply {
+                    this.action = Intent.ACTION_VIEW
                     this.data = Uri.parse(post.advertUrl)
                 })
 
