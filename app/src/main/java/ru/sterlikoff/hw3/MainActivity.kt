@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         locationBtn.setOnClickListener {
 
             startActivity(Intent().apply {
+                this.action = Intent.ACTION_VIEW
                 this.data = Uri.parse("geo:${post.lat},${post.lon}")
             })
 
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         videoBtn.setOnClickListener {
 
             startActivity(Intent().apply {
+                this.action = Intent.ACTION_VIEW
                 this.data = Uri.parse(post.videoUrl)
             })
 
@@ -50,7 +52,13 @@ class MainActivity : AppCompatActivity() {
         title.text = post.title
         date.text = post.getAgoString()
         author.text = post.author
-        likeCount.text = post.likeCount.toString()
+
+        if (post.likeCount == 0) {
+            likeCount.visibility = View.INVISIBLE
+        } else {
+            likeCount.text = post.likeCount.toString()
+        }
+
         commentCount.text = post.commentCount.toString()
         shareCount.text = post.rePostCount.toString()
 
