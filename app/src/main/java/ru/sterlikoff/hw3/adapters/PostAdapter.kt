@@ -14,13 +14,18 @@ import ru.sterlikoff.hw3.interfaces.Item
 import ru.sterlikoff.hw3.models.Post
 import java.lang.IllegalArgumentException
 
-class PostAdapter(private val list: List<Item>, private val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PostAdapter(private var list: List<Item>, private val context: Context) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val title: TextView = itemView.findViewById(R.id.post_title)
         val date: TextView = itemView.findViewById(R.id.post_date)
         val author: TextView = itemView.findViewById(R.id.author)
+
+        val targetLayout: ViewGroup = itemView.findViewById(R.id.targetPostLayout)
+        val targetAuthor: TextView = itemView.findViewById(R.id.new_author)
+        val targetDate: TextView = itemView.findViewById(R.id.new_post_date)
 
         val likeCount: TextView = itemView.findViewById(R.id.like_count)
         val commentCount: TextView = itemView.findViewById(R.id.comment_count)
@@ -29,6 +34,7 @@ class PostAdapter(private val list: List<Item>, private val context: Context) : 
         val likeBtn: ImageView = itemView.findViewById(R.id.btn_like)
         val locationBtn: ImageView = itemView.findViewById(R.id.btn_location)
         val videoBtn: ImageView = itemView.findViewById(R.id.btn_video)
+        val hideBtn: ImageView = itemView.findViewById(R.id.btn_hide)
 
     }
 
@@ -62,9 +68,20 @@ class PostAdapter(private val list: List<Item>, private val context: Context) : 
     private fun onBindPost(holder: RecyclerView.ViewHolder, position: Int) {
 
         val postHolder = holder as PostViewHolder
-        val post = list[position]
+        var post = list[position]
 
         require(post is Post)
+
+        if (post.parent !== null) {
+
+            val new = post
+            post = post.parent!!
+
+            postHolder.targetLayout.visibility = View.VISIBLE
+            postHolder.targetAuthor.text = new.author
+            postHolder.targetDate.text = new.getAgoString()
+
+        }
 
         postHolder.title.text = post.title
         postHolder.date.text = post.getAgoString()
@@ -82,11 +99,11 @@ class PostAdapter(private val list: List<Item>, private val context: Context) : 
         postHolder.likeCount.setTextColor(context.resources.getColor(colorId))
         postHolder.likeBtn.setImageDrawable(context.resources.getDrawable(imageId))
 
-        if (post.lon > 0 && post.lat > 0) {
+        if (post.lon !== null && post.lat !== null) {
             postHolder.locationBtn.visibility = View.VISIBLE
         }
 
-        if (!post.videoUrl.isEmpty()) {
+        if (post.videoUrl !== null) {
             postHolder.videoBtn.visibility = View.VISIBLE
         }
 
@@ -110,6 +127,28 @@ class PostAdapter(private val list: List<Item>, private val context: Context) : 
             context.startActivity(Intent().apply {
                 this.data = Uri.parse(post.videoUrl)
             })
+
+        }
+
+        postHolder.hideBtn.setOnClickListener {
+
+            list = list.filter {
+                it.hashCode() != post.hashCode()
+            }
+
+            notifyDataSetChanged()
+
+        }
+
+        if (post.advertUrl !== null) {
+
+            postHolder.itemView.setOnClickListener {
+
+                context.startActivity(Intent().apply {
+                    this.data = Uri.parse(post.advertUrl)
+                })
+
+            }
 
         }
 

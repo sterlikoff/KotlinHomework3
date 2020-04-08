@@ -4,15 +4,17 @@ import ru.sterlikoff.hw3.interfaces.Item
 
 open class Post(
 
-    var title: String,
-    var author: String,
-    var time: Int,
+    val title: String,
+    val author: String,
+    private val time: Int,
     var likeCount: Int = 0,
-    var commentCount: Int = 0,
-    var rePostCount: Int = 0,
-    var lon: Double = 0.0,
-    var lat: Double = 0.0,
-    var videoUrl: String = ""
+    val commentCount: Int = 0,
+    val rePostCount: Int = 0,
+    val lon: Double? = null,
+    val lat: Double? = null,
+    val videoUrl: String? = null,
+    val parent: Post? = null,
+    val advertUrl: String? = null
 
 ): Item {
 
