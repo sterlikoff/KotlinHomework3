@@ -1,84 +1,23 @@
 package ru.sterlikoff.hw3
 
-import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import ru.sterlikoff.hw3.adapters.PostAdapter
+import ru.sterlikoff.hw3.interfaces.Item
+import ru.sterlikoff.hw3.models.Post
 
 class MainActivity : AppCompatActivity() {
-
-    private fun render(post: Post) {
-
-        val title = findViewById<TextView>(R.id.post_title)
-        val date = findViewById<TextView>(R.id.post_date)
-        val author = findViewById<TextView>(R.id.author)
-
-        val likeCount = findViewById<TextView>(R.id.like_count)
-        val commentCount = findViewById<TextView>(R.id.comment_count)
-        val shareCount = findViewById<TextView>(R.id.share_count)
-
-        val likeBtn = findViewById<ImageView>(R.id.btn_like)
-        val locationBtn = findViewById<ImageView>(R.id.btn_location)
-        val videoBtn = findViewById<ImageView>(R.id.btn_video)
-
-        likeBtn.setOnClickListener {
-
-            post.like()
-            render(post)
-
-        }
-
-        locationBtn.setOnClickListener {
-
-            startActivity(Intent().apply {
-                this.data = Uri.parse("geo:${post.lat},${post.lon}")
-            })
-
-        }
-
-        videoBtn.setOnClickListener {
-
-            startActivity(Intent().apply {
-                this.data = Uri.parse(post.videoUrl)
-            })
-
-        }
-
-        title.text = post.title
-        date.text = post.getAgoString()
-        author.text = post.author
-        likeCount.text = post.likeCount.toString()
-        commentCount.text = post.commentCount.toString()
-        shareCount.text = post.rePostCount.toString()
-
-        var colorId = R.color.gray;
-        if (post.isLiked()) colorId = R.color.colorAccent
-
-        var imageId = R.drawable.ic_thumb_up_ccc_24dp
-        if (post.isLiked()) imageId = R.drawable.ic_thumb_up_accent_24dp
-
-        likeCount.setTextColor(resources.getColor(colorId))
-        likeBtn.setImageDrawable(resources.getDrawable(imageId))
-
-        if (post.lon > 0 && post.lat > 0) {
-            locationBtn.visibility = View.VISIBLE
-        }
-
-        if (!post.videoUrl.isEmpty()) {
-            videoBtn.visibility = View.VISIBLE
-        }
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val post = Post(
+        val list = mutableListOf<Item>()
+
+        list.add(Post(
             "My first post",
             "Danill Sterlikov",
             170484646,
@@ -88,9 +27,32 @@ class MainActivity : AppCompatActivity() {
             33.1546,
             44.46847,
             "https://www.youtube.com/watch?v=WhWc3b3KhnY"
-        )
+        ))
 
-        render(post)
+        list.add(Post(
+            "Secondary post with very-very long title. Really very long title.",
+            "Ivan Ivanov",
+            170400000,
+            7,
+            81,
+            15
+        ))
+
+        list.add(Post(
+            "Third!",
+            "Kolya",
+            170400999,
+            71,
+            810,
+            1,
+            33.1546,
+            44.46847
+        ))
+
+        val listView = findViewById<RecyclerView>(R.id.itemList)
+        listView.adapter = PostAdapter(list, this)
+        listView.layoutManager = LinearLayoutManager(this)
+
 
     }
 

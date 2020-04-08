@@ -1,4 +1,6 @@
-package ru.sterlikoff.hw3
+package ru.sterlikoff.hw3.models
+
+import ru.sterlikoff.hw3.interfaces.Item
 
 open class Post(
 
@@ -12,7 +14,7 @@ open class Post(
     var lat: Double = 0.0,
     var videoUrl: String = ""
 
-) {
+): Item {
 
     private var liked: Boolean = false
 
@@ -30,7 +32,7 @@ open class Post(
 
     fun isLiked() = liked
 
-    fun numericalWordForm(value: Long, form1: String, form2: String, form3: String): String {
+    private fun numericalWordForm(value: Long, form1: String, form2: String, form3: String): String {
 
         if (value in 10..20) return form3
 
@@ -43,7 +45,7 @@ open class Post(
 
     }
 
-    fun timeAgoString(timeAgo: Long): String {
+    private fun timeAgoString(timeAgo: Long): String {
 
         if (timeAgo < 60) return "менее минуты назад"
 
