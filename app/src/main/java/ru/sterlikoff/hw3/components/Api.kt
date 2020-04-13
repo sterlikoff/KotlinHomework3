@@ -1,5 +1,6 @@
 package ru.sterlikoff.hw3.components
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.GsonSerializer
 import io.ktor.client.features.json.JsonFeature
@@ -13,7 +14,7 @@ class Api {
     companion object {
 
         @KtorExperimentalAPI
-        suspend fun load(url: String): List<Post> {
+        suspend fun load(url: String): List<Post>? {
 
             val client = HttpClient {
                 install(JsonFeature) {
@@ -26,11 +27,20 @@ class Api {
                 }
             }
 
-            val res = client.get<List<Post>>(url)
-            client.close()
+            try {
 
-            return res
+                val res = client.get<List<Post>>(url)
+                client.close()
 
+                return res
+
+            } catch (e: Throwable) {
+
+                Log.i("error", e.message ?: "")
+
+            }
+
+            return null
         }
 
     }

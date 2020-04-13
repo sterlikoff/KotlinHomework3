@@ -14,8 +14,45 @@ import ru.sterlikoff.hw3.interfaces.Item
 import ru.sterlikoff.hw3.models.Post
 import java.lang.IllegalArgumentException
 
-class PostAdapter(private var list: List<Item>, private val context: Context) :
+class PostAdapter(
+
+    mainList: List<Item>,
+    advList: List<Item>,
+    private val context: Context
+
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private var list = fun(): MutableList<Item> {
+
+        val iList: MutableList<Item> = mutableListOf()
+        var advIterator = advList.iterator()
+
+        if (advList.count() == 0) return mainList.toMutableList()
+
+        mainList.forEach {
+
+            if (mainList.indexOf(it) % 3 == 0) {
+
+                if (advIterator.hasNext()) {
+
+                    iList.add(advIterator.next())
+
+                } else {
+
+                    advIterator = advList.iterator()
+                    iList.add(advIterator.next())
+
+                }
+
+            }
+
+            iList.add(it)
+        }
+
+        return iList
+
+    }()
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -142,7 +179,7 @@ class PostAdapter(private var list: List<Item>, private val context: Context) :
 
             list = list.filter {
                 it.hashCode() != post.hashCode()
-            }
+            }.toMutableList()
 
             notifyDataSetChanged()
 
