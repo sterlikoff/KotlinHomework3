@@ -10,11 +10,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ru.sterlikoff.hw3.R
-import ru.sterlikoff.hw3.interfaces.Item
 import ru.sterlikoff.hw3.models.Post
 import java.lang.IllegalArgumentException
 
-class PostAdapter(private var list: List<Item>, private val context: Context) :
+class PostAdapter(private var list: MutableList<Post>, private val context: Context) :
+
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -69,8 +69,6 @@ class PostAdapter(private var list: List<Item>, private val context: Context) :
 
         val postHolder = holder as PostViewHolder
         var post = list[position]
-
-        require(post is Post)
 
         if (post.parent !== null) {
 
@@ -140,10 +138,7 @@ class PostAdapter(private var list: List<Item>, private val context: Context) :
 
         postHolder.hideBtn.setOnClickListener {
 
-            list = list.filter {
-                it.hashCode() != post.hashCode()
-            }
-
+            list.removeAt(position)
             notifyDataSetChanged()
 
         }
@@ -163,14 +158,7 @@ class PostAdapter(private var list: List<Item>, private val context: Context) :
 
     }
 
-    override fun getItemViewType(position: Int): Int =
-
-        when (list[position]) {
-
-            is Post -> TYPE_POST
-            else -> throw IllegalArgumentException()
-
-        }
+    override fun getItemViewType(position: Int): Int = TYPE_POST
 
     companion object {
         private const val TYPE_POST = 1

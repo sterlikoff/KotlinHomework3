@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ru.sterlikoff.hw3.adapters.PostAdapter
-import ru.sterlikoff.hw3.interfaces.Item
 import ru.sterlikoff.hw3.models.Post
 
 class MainActivity : AppCompatActivity() {
@@ -15,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val list = mutableListOf<Item>()
+        val list = mutableListOf<Post>()
 
         list.add(
             Post(

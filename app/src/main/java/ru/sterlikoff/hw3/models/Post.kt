@@ -1,7 +1,5 @@
 package ru.sterlikoff.hw3.models
 
-import ru.sterlikoff.hw3.interfaces.Item
-
 open class Post(
 
     val title: String,
@@ -16,7 +14,7 @@ open class Post(
     val parent: Post? = null,
     val advertUrl: String? = null
 
-): Item {
+) {
 
     private var liked: Boolean = false
 
