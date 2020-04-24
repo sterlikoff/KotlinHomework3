@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">HW3</string>
     <string name="server_unavailable_message">Server unavailable</string>
+    <string name="login_label">Логин</string>
+    <string name="password_label">Пароль</string>
+    <string name="login_btn_label">Войти</string>
+    <string name="illegal_login_or_password_label">Неверный логин или пароль</string>
+    <string name="registration_label">Регистрация</string>
+    <string name="error_label">Ошибка</string>
 </resources>

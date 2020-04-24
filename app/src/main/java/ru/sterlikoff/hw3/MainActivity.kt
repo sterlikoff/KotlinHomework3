@@ -2,53 +2,127 @@ package ru.sterlikoff.hw3
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.ktor.util.KtorExperimentalAPI
+import kotlinx.android.synthetic.main.dialog_login.view.*
 import kotlinx.coroutines.*
-import ru.sterlikoff.hw3.adapters.PostAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import ru.sterlikoff.hw3.components.Api
+import kotlinx.android.synthetic.main.dialog_login.view.editLogin
+import kotlinx.android.synthetic.main.dialog_login.view.editPassword
+import kotlinx.android.synthetic.main.dialog_registration.view.*
+import ru.sterlikoff.hw3.adapters.PostAdapter
+import ru.sterlikoff.hw3.components.Repository
 
 class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
-    private val server = "https://raw.githubusercontent.com/sterlikoff/PostGenerator/master"
+    private fun showMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
 
-    @KtorExperimentalAPI
-    private fun fetch() = launch {
+    private fun registrationDialog() {
 
-        progressBar.visibility = View.VISIBLE
+        val alert = AlertDialog.Builder(this).create()
+        val view =
+            layoutInflater.inflate(
+                R.layout.dialog_registration,
+                alert.findViewById(R.id.bodyRegistration)
+            )
 
-        val mainList = withContext(Dispatchers.IO) {
-            Api.load("$server/main.json")
+        with(view) {
+
+            buttonRegistration.setOnClickListener {
+
+                if (editLogin.text.toString().isEmpty() || editPassword.text.toString().isEmpty()) {
+
+                    showMessage("Заполните все поля")
+
+                } else {
+
+                    launch {
+
+                        val response = Repository.registration(
+                            editLogin.text.toString(),
+                            editPassword.text.toString()
+                        )
+
+                        if (response.isSuccessful) {
+                            alert.dismiss()
+                        } else {
+                            showMessage(context.getString(R.string.error_label))
+                        }
+
+                    }
+
+                }
+
+            }
+
         }
 
-        val advList = withContext(Dispatchers.IO) {
-            Api.load("$server/adv.json")
-        }
-
-        progressBar.visibility = View.GONE
-
-        if (mainList != null && advList != null) {
-
-            itemList.adapter = PostAdapter(mainList, advList, this@MainActivity)
-
-        } else {
-            Toast.makeText(this@MainActivity, getString(R.string.server_unavailable_message), Toast.LENGTH_LONG).show()
-        }
+        alert.setView(view)
+        alert.show()
 
     }
 
-    @KtorExperimentalAPI
+    private fun loginDialog() {
+
+        val alert = AlertDialog.Builder(this).create()
+        val view =
+            layoutInflater.inflate(R.layout.dialog_login, alert.findViewById(R.id.bodyLogin))
+
+        with(view) {
+
+            buttonLogin.setOnClickListener {
+
+                if (editLogin.text.toString().isEmpty() || editPassword.text.toString().isEmpty()) {
+
+                    showMessage("Заполните все поля")
+
+                } else {
+
+                    launch {
+
+                        val response = Repository.authenticate(
+                            editLogin.text.toString(),
+                            editPassword.text.toString()
+                        )
+
+                        val token = response.body()?.token ?: ""
+
+                        if (token.isNotEmpty() && response.isSuccessful) {
+                            alert.dismiss()
+                        } else {
+                            showMessage(context.getString(R.string.illegal_login_or_password_label))
+                        }
+
+                    }
+
+                }
+
+            }
+
+            buttonOpenRegistration.setOnClickListener {
+                registrationDialog()
+            }
+
+        }
+
+        alert.setCancelable(false)
+        alert.setView(view)
+        alert.show()
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        itemList.layoutManager = LinearLayoutManager(this@MainActivity)
+        itemList.layoutManager = LinearLayoutManager(this)
+        itemList.adapter = PostAdapter(mutableListOf(), mutableListOf(), this)
 
-        fetch()
+        loginDialog()
 
     }
 
