@@ -7,4 +7,5 @@
     <string name="illegal_login_or_password_label">Неверный логин или пароль</string>
     <string name="registration_label">Регистрация</string>
     <string name="error_label">Ошибка</string>
+    <string name="auth_label">Авторизация</string>
 </resources>
