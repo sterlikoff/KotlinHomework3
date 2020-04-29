@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
+import ru.sterlikoff.hw3.models.AuthRequestParams
 import ru.sterlikoff.hw3.components.Repository
 
 class LoginActivity : MyActivity() {
@@ -42,11 +43,12 @@ class LoginActivity : MyActivity() {
 
         buttonLogin.setOnClickListener {
 
-            if (editLogin.text.toString().isEmpty() || editPassword.text.toString().isEmpty()) {
+            val auth = AuthRequestParams(
+                editLogin.text.toString(),
+                editPassword.text.toString()
+            )
 
-                showMessage("Заполните все поля")
-
-            } else {
+            if (auth.validate()) {
 
                 launch {
 
@@ -57,10 +59,7 @@ class LoginActivity : MyActivity() {
                         show()
                     }
 
-                    val response = Repository.authenticate(
-                        editLogin.text.toString(),
-                        editPassword.text.toString()
-                    )
+                    val response = Repository.authenticate(auth)
 
                     dialog.dismiss()
 
@@ -74,6 +73,20 @@ class LoginActivity : MyActivity() {
                     } else {
                         showMessage(getString(R.string.illegal_login_or_password_label))
                     }
+
+                }
+
+            } else {
+
+                auth.errors.forEach {
+
+                    val field = when (it.key) {
+                        "username" -> editLogin
+                        "password" -> editPassword
+                        else -> throw Exception("Неизвестная ошибка")
+                    }
+
+                    field.error = it.value
 
                 }
 

@@ -3,9 +3,8 @@ package ru.sterlikoff.hw3.components
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
-
-data class AuthRequestParams(val username: String, val password: String)
-data class RegistrationRequestParams(val username: String, val password: String)
+import ru.sterlikoff.hw3.models.AuthRequestParams
+import ru.sterlikoff.hw3.models.RegistrationRequestParams
 
 data class Token(val token: String)
 
