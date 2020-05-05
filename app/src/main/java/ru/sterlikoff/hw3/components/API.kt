@@ -7,6 +7,7 @@ import retrofit2.http.POST
 import ru.sterlikoff.hw3.models.AuthRequestParams
 import ru.sterlikoff.hw3.models.RegistrationRequestParams
 import ru.sterlikoff.hw3.models.dto.PostInDto
+import ru.sterlikoff.hw3.models.dto.PostOutDto
 
 data class Token(val token: String)
 
@@ -20,5 +21,8 @@ interface API {
 
     @GET("api/v1/posts")
     suspend fun getPosts(): Response<List<PostInDto>>
+
+    @POST("api/v1/posts/create")
+    suspend fun addPost(@Body params: PostOutDto): Response<PostInDto>
 
 }

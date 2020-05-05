@@ -1,6 +1,5 @@
 package ru.sterlikoff.hw3.components
 
-import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
@@ -8,6 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.sterlikoff.hw3.models.AuthRequestParams
 import ru.sterlikoff.hw3.models.RegistrationRequestParams
+import ru.sterlikoff.hw3.models.dto.PostOutDto
 
 object Repository {
 
@@ -45,5 +45,6 @@ object Repository {
     suspend fun authenticate(request: AuthRequestParams) = API.authenticate(request)
     suspend fun registration(request: RegistrationRequestParams) = API.registration(request)
     suspend fun getPosts() = API.getPosts()
+    suspend fun addPost(request: PostOutDto) = API.addPost(request)
 
 }

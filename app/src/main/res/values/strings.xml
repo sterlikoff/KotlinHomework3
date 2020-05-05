@@ -13,6 +13,11 @@
     <string name="less_then_minute_ago_label">менее минуты назад</string>
     <string name="more_hour_ago_label">больше года назад</string>
     <string name="back_label">назад</string>
+    <string name="loading_data_error_label">При загрузке данных произошла ошибка</string>
+    <string name="add_post_label">Добавить пост</string>
+    <string name="save_label">Сохранить</string>
+    <string name="post_title_label">Заголовок поста</string>
+    <string name="post_text_label">Текст поста</string>
 
     <plurals name="minute_plural">
 

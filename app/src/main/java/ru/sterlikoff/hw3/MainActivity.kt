@@ -1,7 +1,10 @@
 package ru.sterlikoff.hw3
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,11 +33,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
                     Post.fromInDto(it)
                 }
 
-                itemList.adapter = PostAdapter(list ?: mutableListOf(), mutableListOf(), this@MainActivity)
+                itemList.adapter =
+                    PostAdapter(list ?: mutableListOf(), mutableListOf(), this@MainActivity)
 
             } else {
 
-                toast("При загрузке данных произошла ошибка " + result.code())
+                toast(getString(R.string.loading_data_error_label) + result.code())
 
             }
 
@@ -54,6 +58,30 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
         super.onCreate(savedInstanceState)
         itemList.layoutManager = LinearLayoutManager(this)
 
+        supportActionBar?.title = "Лента"
+
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        menuInflater.inflate(R.menu.new_post, menu)
+        return true
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+
+        when (item.itemId) {
+
+            R.id.btn_new_post -> {
+
+                startActivity(Intent(this, PostActivity::class.java))
+                false
+
+            }
+
+            else -> true
+
+        }
 
 }
