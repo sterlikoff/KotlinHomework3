@@ -1,5 +1,7 @@
 package ru.sterlikoff.hw3.models
 
+import android.content.Context
+import ru.sterlikoff.hw3.R
 import ru.sterlikoff.hw3.interfaces.Item
 import ru.sterlikoff.hw3.models.dto.PostInDto
 
@@ -35,56 +37,40 @@ open class Post(
 
     fun isLiked() = liked
 
-    private fun numericalWordForm(
-        value: Long,
-        form1: String,
-        form2: String,
-        form3: String
-    ): String {
+    fun getAgoString(context: Context): String {
 
-        if (value in 10..20) return form3
+        val timeAgo = (System.currentTimeMillis() - time)
 
-        return when (value % 10) {
-
-            1L -> form1
-            in 2L..4L -> form2
-            else -> form3
-        }
-
-    }
-
-    private fun timeAgoString(timeAgo: Long): String {
-
-        if (timeAgo < 60) return "менее минуты назад"
+        if (timeAgo < 60) return context.getString(R.string.less_then_minute_ago_label)
 
         if (timeAgo < 60 * 60) {
 
             val m: Long = timeAgo / 60
-            return "$m ${numericalWordForm(m, "минуту", "минуты", "минут")} назад"
+            val form = context.resources.getQuantityString(R.plurals.minute_plural, m.toInt())
+
+            return "$m $form ${context.getString(R.string.back_label)}"
 
         }
 
         if (timeAgo < 60 * 60 * 24) {
 
             val h: Long = timeAgo / (60 * 60)
-            return "$h ${numericalWordForm(h, "час", "часа", "часов")} назад"
+            val form = context.resources.getQuantityString(R.plurals.hour_plural, h.toInt())
+
+            return "$h $form ${context.getString(R.string.back_label)}"
 
         }
 
         if (timeAgo <= 60 * 60 * 24 * 365) {
 
             val d: Long = timeAgo / (60 * 60 * 24)
-            return "$d ${numericalWordForm(d, "день", "дня", "дней")} назад"
+            val form = context.resources.getQuantityString(R.plurals.day_plural, d.toInt())
+
+            return "$d $form ${context.getString(R.string.back_label)}"
 
         }
 
-        return "больше года назад"
-
-    }
-
-    fun getAgoString(): String {
-
-        return timeAgoString(System.currentTimeMillis() - time)
+        return context.getString(R.string.more_hour_ago_label)
 
     }
 

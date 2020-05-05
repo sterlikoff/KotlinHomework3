@@ -8,4 +8,43 @@
     <string name="registration_label">Регистрация</string>
     <string name="error_label">Ошибка</string>
     <string name="auth_label">Авторизация</string>
+    <string name="please_wait_label">Пожалуйста подождите…</string>
+    <string name="loading_data_label">Загрузка данных</string>
+    <string name="less_then_minute_ago_label">менее минуты назад</string>
+    <string name="more_hour_ago_label">больше года назад</string>
+    <string name="back_label">назад</string>
+
+    <plurals name="minute_plural">
+
+        <item quantity="zero">%1$d минут</item>
+        <item quantity="one">%1$d минута</item>
+        <item quantity="two">%1$d минуты</item>
+        <item quantity="few">%1$d минуты</item>
+        <item quantity="many">%1$d минут</item>
+        <item quantity="other">%1$d минут</item>
+
+    </plurals>
+
+    <plurals name="hour_plural">
+
+        <item quantity="zero">%1$d часов</item>
+        <item quantity="one">%1$d час</item>
+        <item quantity="two">%1$d часа</item>
+        <item quantity="few">%1$d часа</item>
+        <item quantity="many">%1$d часов</item>
+        <item quantity="other">%1$d часов</item>
+
+    </plurals>
+
+    <plurals name="day_plural">
+
+        <item quantity="zero">%1$d дней</item>
+        <item quantity="one">%1$d день</item>
+        <item quantity="two">%1$d дня</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other">%1$d дней</item>
+
+    </plurals>
+
 </resources>

@@ -1,17 +1,23 @@
 package ru.sterlikoff.hw3
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
 import ru.sterlikoff.hw3.models.AuthRequestParams
 import ru.sterlikoff.hw3.components.Repository
+import splitties.toast.toast
 
-class LoginActivity : MyActivity() {
+class LoginActivity : AppCompatActivity(R.layout.activity_login), ActivityUI {
+
+    override var dialog: ProgressDialog? = null
 
     private fun startApp() {
 
-        Repository.createRetrofitWithAuth(getToken()!!)
+        Repository.createRetrofitWithAuth(getToken(this)!!)
 
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         startActivity(intent)
@@ -21,10 +27,9 @@ class LoginActivity : MyActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        if (isAuthenticated()) startApp()
+        if (isAuthenticated(this)) startApp()
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
         buttonLogin.setOnClickListener {
 
@@ -35,9 +40,9 @@ class LoginActivity : MyActivity() {
 
             if (auth.validate()) {
 
-                launch {
+                lifecycleScope.launch {
 
-                    showProgress()
+                    showProgress(this@LoginActivity)
                     val response = Repository.authenticate(auth)
                     hideProgress()
 
@@ -45,11 +50,11 @@ class LoginActivity : MyActivity() {
 
                     if (token.isNotEmpty() && response.isSuccessful) {
 
-                        setUserAuth(token)
+                        setUserAuth(token, this@LoginActivity)
                         startApp()
 
                     } else {
-                        showMessage(getString(R.string.illegal_login_or_password_label))
+                        toast(getString(R.string.illegal_login_or_password_label))
                     }
 
                 }

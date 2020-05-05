@@ -116,12 +116,12 @@ class PostAdapter(
 
             postHolder.targetLayout.visibility = View.VISIBLE
             postHolder.targetAuthor.text = new.author
-            postHolder.targetDate.text = new.getAgoString()
+            postHolder.targetDate.text = new.getAgoString(context)
 
         }
 
         postHolder.title.text = post.title
-        postHolder.date.text = post.getAgoString()
+        postHolder.date.text = post.getAgoString(context)
         postHolder.author.text = post.author
 
         if (post.likeCount == 0) {

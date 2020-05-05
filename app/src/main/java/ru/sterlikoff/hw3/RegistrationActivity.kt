@@ -2,19 +2,23 @@ package ru.sterlikoff.hw3
 
 import android.app.ProgressDialog
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_registration.*
 import kotlinx.android.synthetic.main.activity_registration.editLogin
 import kotlinx.android.synthetic.main.activity_registration.editPassword
 import kotlinx.coroutines.launch
 import ru.sterlikoff.hw3.models.RegistrationRequestParams
 import ru.sterlikoff.hw3.components.Repository
+import splitties.toast.toast
 
-class RegistrationActivity : MyActivity() {
+class RegistrationActivity : AppCompatActivity(R.layout.activity_registration), ActivityUI {
+
+    override var dialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_registration)
 
         buttonRegistration.setOnClickListener {
 
@@ -26,16 +30,16 @@ class RegistrationActivity : MyActivity() {
 
             if (registrationRequest.validate()) {
 
-                launch {
+                lifecycleScope.launch {
 
-                    showProgress()
+                    showProgress(this@RegistrationActivity)
                     val response = Repository.registration(registrationRequest)
                     hideProgress()
 
                     if (response.isSuccessful) {
                         finish()
                     } else {
-                        showMessage(getString(R.string.error_label))
+                        toast(getString(R.string.error_label))
                     }
 
                 }
