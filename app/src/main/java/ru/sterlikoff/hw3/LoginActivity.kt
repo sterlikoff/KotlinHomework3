@@ -1,6 +1,5 @@
 package ru.sterlikoff.hw3
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_login.*
@@ -10,20 +9,9 @@ import ru.sterlikoff.hw3.components.Repository
 
 class LoginActivity : MyActivity() {
 
-    private fun isAuthenticated() =
-
-        getSharedPreferences(API_SHARED_FILE, MODE_PRIVATE).getString(
-            AUTHENTICATED_SHARED_KEY, ""
-        )?.isNotEmpty() ?: false
-
-    private fun setUserAuth(token: String) =
-
-        getSharedPreferences(API_SHARED_FILE, MODE_PRIVATE)
-            .edit()
-            .putString(AUTHENTICATED_SHARED_KEY, token)
-            .commit()
-
     private fun startApp() {
+
+        Repository.createRetrofitWithAuth(getToken()!!)
 
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         startActivity(intent)
@@ -33,10 +21,7 @@ class LoginActivity : MyActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        if (isAuthenticated()) {
-            startApp()
-            return
-        }
+        if (isAuthenticated()) startApp()
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -52,16 +37,9 @@ class LoginActivity : MyActivity() {
 
                 launch {
 
-                    val dialog = ProgressDialog(this@LoginActivity).apply {
-                        setMessage("Пожалуйста подождите...")
-                        setTitle("Загрузка данных")
-                        setCancelable(false)
-                        show()
-                    }
-
+                    showProgress()
                     val response = Repository.authenticate(auth)
-
-                    dialog.dismiss()
+                    hideProgress()
 
                     val token = response.body()?.token ?: ""
 
@@ -101,11 +79,6 @@ class LoginActivity : MyActivity() {
 
         }
 
-    }
-
-    companion object {
-        const val AUTHENTICATED_SHARED_KEY = "authenticated_shared_key"
-        const val API_SHARED_FILE = "API_shared_file"
     }
 
 }

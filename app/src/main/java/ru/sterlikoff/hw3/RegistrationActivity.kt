@@ -28,16 +28,9 @@ class RegistrationActivity : MyActivity() {
 
                 launch {
 
-                    val dialog = ProgressDialog(this@RegistrationActivity).apply {
-                        setMessage("Пожалуйста подождите...")
-                        setTitle("Загрузка данных")
-                        setCancelable(false)
-                        show()
-                    }
-
+                    showProgress()
                     val response = Repository.registration(registrationRequest)
-
-                    dialog.dismiss()
+                    hideProgress()
 
                     if (response.isSuccessful) {
                         finish()

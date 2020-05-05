@@ -1,6 +1,7 @@
 package ru.sterlikoff.hw3.models
 
 import ru.sterlikoff.hw3.interfaces.Item
+import ru.sterlikoff.hw3.models.dto.PostInDto
 
 open class Post(
 
@@ -16,7 +17,7 @@ open class Post(
     val parent: Post? = null,
     val advertUrl: String? = null
 
-): Item {
+) : Item {
 
     private var liked: Boolean = false
 
@@ -34,7 +35,12 @@ open class Post(
 
     fun isLiked() = liked
 
-    private fun numericalWordForm(value: Long, form1: String, form2: String, form3: String): String {
+    private fun numericalWordForm(
+        value: Long,
+        form1: String,
+        form2: String,
+        form3: String
+    ): String {
 
         if (value in 10..20) return form3
 
@@ -79,6 +85,28 @@ open class Post(
     fun getAgoString(): String {
 
         return timeAgoString(System.currentTimeMillis() - time)
+
+    }
+
+    companion object {
+
+        fun fromInDto(input: PostInDto): Post {
+
+            return Post(
+                title = input.title,
+                author = input.userId.toString(), // @TODO
+                time = input.time.toInt(),
+                likeCount = input.likeCount,
+                commentCount = input.commentCount,
+                rePostCount = input.rePostCount,
+                lon = input.lon,
+                lat = input.lat,
+                videoUrl = input.videoUrl,
+                parent = null, // @TODO
+                advertUrl = input.advertUrl
+            )
+
+        }
 
     }
 
