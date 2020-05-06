@@ -8,6 +8,7 @@ import ru.sterlikoff.hw3.models.dto.PostInDto
 open class Post(
 
     val title: String,
+    val content: String,
     val author: String,
     private val time: Int,
     var likeCount: Int = 0,
@@ -80,7 +81,8 @@ open class Post(
 
             return Post(
                 title = input.title,
-                author = input.userId.toString(), // @TODO
+                content = input.content,
+                author = input.username,
                 time = input.time.toInt(),
                 likeCount = input.likeCount,
                 commentCount = input.commentCount,

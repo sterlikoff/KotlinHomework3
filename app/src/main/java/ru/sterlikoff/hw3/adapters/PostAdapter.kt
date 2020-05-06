@@ -57,6 +57,7 @@ class PostAdapter(
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val title: TextView = itemView.findViewById(R.id.post_title)
+        val content: TextView = itemView.findViewById(R.id.post_content)
         val date: TextView = itemView.findViewById(R.id.post_date)
         val author: TextView = itemView.findViewById(R.id.author)
 
@@ -123,6 +124,7 @@ class PostAdapter(
         postHolder.title.text = post.title
         postHolder.date.text = post.getAgoString(context)
         postHolder.author.text = post.author
+        postHolder.content.text = post.content
 
         if (post.likeCount == 0) {
             postHolder.likeCount.visibility = View.INVISIBLE

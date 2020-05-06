@@ -4,7 +4,8 @@ data class PostInDto(
 
     val id: Int,
     val title: String,
-    val userId: Int,
+    val content: String,
+    val username: String,
     val time: Long,
     val likeCount: Int = 0,
     val commentCount: Int = 0,

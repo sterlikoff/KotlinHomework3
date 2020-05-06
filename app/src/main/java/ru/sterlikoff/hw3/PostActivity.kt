@@ -34,7 +34,8 @@ class PostActivity : AppCompatActivity(R.layout.activity_post), ActivityUI {
     private fun savePost() = lifecycleScope.launch {
 
             val post = PostOutDto(
-                editTitle.text.toString()
+                editTitle.text.toString(),
+                editText.text.toString()
             )
 
             showProgress(this@PostActivity)
