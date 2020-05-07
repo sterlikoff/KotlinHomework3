@@ -41,10 +41,14 @@ interface ActivityUI {
     fun isAuthenticated(context: Context) = getToken(context)?.isNotEmpty() ?: false
 
     fun setUserAuth(token: String, context: Context) =
+        context.getSharedPreferences(API_SHARED_FILE, AppCompatActivity.MODE_PRIVATE).edit {
+            putString(AUTHENTICATED_SHARED_KEY, token)
+        }
 
-        context.getSharedPreferences(API_SHARED_FILE, AppCompatActivity.MODE_PRIVATE)
-            .edit {
-                putString(AUTHENTICATED_SHARED_KEY, token)
-            }
+    fun logout(context: Context) =
+        context.getSharedPreferences(API_SHARED_FILE, AppCompatActivity.MODE_PRIVATE).edit {
+            remove(AUTHENTICATED_SHARED_KEY)
+        }
+
 
 }

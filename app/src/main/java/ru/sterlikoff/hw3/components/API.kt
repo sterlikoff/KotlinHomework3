@@ -1,9 +1,7 @@
 package ru.sterlikoff.hw3.components
 
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 import ru.sterlikoff.hw3.models.AuthRequestParams
 import ru.sterlikoff.hw3.models.RegistrationRequestParams
 import ru.sterlikoff.hw3.models.dto.PostInDto
@@ -24,5 +22,8 @@ interface API {
 
     @POST("api/v1/posts/create")
     suspend fun addPost(@Body params: PostOutDto): Response<PostInDto>
+
+    @GET("/api/v1/posts/share/{id}")
+    suspend fun share(@Path("id") id: Int): Response<PostInDto>
 
 }

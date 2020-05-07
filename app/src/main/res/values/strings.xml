@@ -18,6 +18,7 @@
     <string name="save_label">Сохранить</string>
     <string name="post_title_label">Заголовок поста</string>
     <string name="post_text_label">Текст поста</string>
+    <string name="share_post_error_label">При публикации поста произошла ошибка</string>
 
     <plurals name="minute_plural">
 

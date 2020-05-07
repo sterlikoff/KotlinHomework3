@@ -46,5 +46,6 @@ object Repository {
     suspend fun registration(request: RegistrationRequestParams) = API.registration(request)
     suspend fun getPosts() = API.getPosts()
     suspend fun addPost(request: PostOutDto) = API.addPost(request)
+    suspend fun share(id: Int) = API.share(id)
 
 }

@@ -12,12 +12,40 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import ru.sterlikoff.hw3.adapters.PostAdapter
 import ru.sterlikoff.hw3.components.Repository
+import ru.sterlikoff.hw3.interfaces.Item
+import ru.sterlikoff.hw3.interfaces.PostEvents
 import ru.sterlikoff.hw3.models.Post
 import splitties.toast.toast
 
 class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
 
     override var dialog: ProgressDialog? = null
+
+    private val postEvents = object : PostEvents {
+
+        override fun share(post: Post) {
+
+            lifecycleScope.launch {
+
+                showProgress(this@MainActivity)
+                val result = Repository.share(post.id)
+                hideProgress()
+
+                if (result.isSuccessful) {
+
+                    fetch()
+
+                } else {
+
+                    toast(getString(R.string.share_post_error_label))
+
+                }
+
+            }
+
+        }
+
+    }
 
     private fun fetch() {
 
@@ -29,16 +57,25 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
 
             if (result.isSuccessful) {
 
-                val list: List<Post>? = result.body()?.map {
-                    Post.fromInDto(it)
-                }
+                val list = result.body()?.map {
+                    Post.fromInDto(it) as Item
+                }?.toMutableList() ?: throw Exception("Server returned empty body")
 
-                itemList.adapter =
-                    PostAdapter(list ?: mutableListOf(), mutableListOf(), this@MainActivity)
+                itemList.adapter = PostAdapter(list, this@MainActivity, postEvents)
 
             } else {
 
-                toast(getString(R.string.loading_data_error_label) + result.code())
+                if (result.code() == 401) {
+
+                    logout(this@MainActivity)
+                    startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                    finish()
+
+                } else {
+
+                    toast(getString(R.string.loading_data_error_label) + result.code())
+
+                }
 
             }
 

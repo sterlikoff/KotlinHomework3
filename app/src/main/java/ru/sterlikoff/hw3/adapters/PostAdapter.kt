@@ -11,48 +11,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ru.sterlikoff.hw3.R
 import ru.sterlikoff.hw3.interfaces.Item
+import ru.sterlikoff.hw3.interfaces.PostEvents
 import ru.sterlikoff.hw3.models.Post
 import java.lang.IllegalArgumentException
 
 class PostAdapter(
 
-    mainList: List<Item>,
-    advList: List<Item>,
-    private val context: Context
+    private val list: MutableList<Item>,
+    private val context: Context,
+    private val events: PostEvents
 
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private var list = fun(): MutableList<Item> {
-
-        val iList: MutableList<Item> = mutableListOf()
-        var advIterator = advList.iterator()
-
-        if (advList.count() == 0) return mainList.toMutableList()
-
-        mainList.forEach {
-
-            if (mainList.indexOf(it) % 3 == 0) {
-
-                if (advIterator.hasNext()) {
-
-                    iList.add(advIterator.next())
-
-                } else {
-
-                    advIterator = advList.iterator()
-                    iList.add(advIterator.next())
-
-                }
-
-            }
-
-            iList.add(it)
-        }
-
-        return iList
-
-    }()
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -73,6 +43,7 @@ class PostAdapter(
         val locationBtn: ImageView = itemView.findViewById(R.id.btn_location)
         val videoBtn: ImageView = itemView.findViewById(R.id.btn_video)
         val hideBtn: ImageView = itemView.findViewById(R.id.btn_hide)
+        val shareBtn: ImageView = itemView.findViewById(R.id.share_btn)
 
     }
 
@@ -162,8 +133,8 @@ class PostAdapter(
         postHolder.locationBtn.setOnClickListener {
 
             context.startActivity(Intent().apply {
-                this.action = Intent.ACTION_VIEW
-                this.data = Uri.parse("geo:${post.lat},${post.lon}")
+                action = Intent.ACTION_VIEW
+                data = Uri.parse("geo:${post.lat},${post.lon}")
             })
 
         }
@@ -171,18 +142,15 @@ class PostAdapter(
         postHolder.videoBtn.setOnClickListener {
 
             context.startActivity(Intent().apply {
-                this.action = Intent.ACTION_VIEW
-                this.data = Uri.parse(post.videoUrl)
+                action = Intent.ACTION_VIEW
+                data = Uri.parse(post.videoUrl)
             })
 
         }
 
         postHolder.hideBtn.setOnClickListener {
 
-            list = list.filter {
-                it.hashCode() != post.hashCode()
-            }.toMutableList()
-
+            list.remove(post)
             notifyDataSetChanged()
 
         }
@@ -192,12 +160,16 @@ class PostAdapter(
             postHolder.itemView.setOnClickListener {
 
                 context.startActivity(Intent().apply {
-                    this.action = Intent.ACTION_VIEW
-                    this.data = Uri.parse(post.advertUrl)
+                    action = Intent.ACTION_VIEW
+                    data = Uri.parse(post.advertUrl)
                 })
 
             }
 
+        }
+
+        postHolder.shareBtn.setOnClickListener {
+            events.share(post)
         }
 
     }

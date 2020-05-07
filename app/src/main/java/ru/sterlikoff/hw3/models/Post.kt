@@ -7,6 +7,7 @@ import ru.sterlikoff.hw3.models.dto.PostInDto
 
 open class Post(
 
+    val id: Int,
     val title: String,
     val content: String,
     val author: String,
@@ -80,6 +81,7 @@ open class Post(
         fun fromInDto(input: PostInDto): Post {
 
             return Post(
+                id = input.id,
                 title = input.title,
                 content = input.content,
                 author = input.username,
