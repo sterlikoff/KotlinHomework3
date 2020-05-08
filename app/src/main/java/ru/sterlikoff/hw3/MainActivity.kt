@@ -21,6 +21,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
 
     override var dialog: ProgressDialog? = null
 
+    private var offset = 0
+    private val limit = 3
+
     private val postEvents = object : PostEvents {
 
         override fun share(post: Post) {
@@ -45,23 +48,32 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
 
         }
 
+        override fun next() {
+
+            offset += limit
+            fetch()
+
+        }
+
     }
+
+    private val postAdapter: PostAdapter = PostAdapter(mutableListOf(), this, postEvents)
 
     private fun fetch() {
 
         lifecycleScope.launch {
 
             showProgress(this@MainActivity)
-            val result = Repository.getPosts()
+            val result = Repository.getPosts(limit, offset)
             hideProgress()
 
             if (result.isSuccessful) {
 
                 val list = result.body()?.map {
                     Post.fromInDto(it) as Item
-                }?.toMutableList() ?: throw Exception("Server returned empty body")
+                }?.toList() ?: throw Exception("Server returned empty body")
 
-                itemList.adapter = PostAdapter(list, this@MainActivity, postEvents)
+                postAdapter.add(list)
 
             } else {
 
@@ -94,6 +106,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
 
         super.onCreate(savedInstanceState)
         itemList.layoutManager = LinearLayoutManager(this)
+        itemList.adapter = postAdapter
 
         supportActionBar?.title = "Лента"
 

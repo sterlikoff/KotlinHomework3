@@ -18,7 +18,7 @@ interface API {
     suspend fun registration(@Body params: RegistrationRequestParams): Response<String>
 
     @GET("api/v1/posts")
-    suspend fun getPosts(): Response<List<PostInDto>>
+    suspend fun getPosts(@Query("limit") limit: Int, @Query("offset") offset: Int): Response<List<PostInDto>>
 
     @POST("api/v1/posts/create")
     suspend fun addPost(@Body params: PostOutDto): Response<PostInDto>
