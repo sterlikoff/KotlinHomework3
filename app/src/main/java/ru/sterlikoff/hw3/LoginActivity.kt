@@ -19,7 +19,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), ActivityUI {
 
         Repository.createRetrofitWithAuth(getToken(this)!!)
 
-        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        val intent = Intent(this@LoginActivity, FeedActivity::class.java)
         startActivity(intent)
         finish()
 
@@ -43,18 +43,25 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login), ActivityUI {
                 lifecycleScope.launch {
 
                     showProgress(this@LoginActivity)
-                    val response = Repository.authenticate(auth)
-                    hideProgress()
 
-                    val token = response.body()?.token ?: ""
+                    try {
 
-                    if (token.isNotEmpty() && response.isSuccessful) {
+                        val response = Repository.authenticate(auth)
+                        val token = response.body()?.token ?: ""
 
-                        setUserAuth(token, this@LoginActivity)
-                        startApp()
+                        if (token.isNotEmpty() && response.isSuccessful) {
 
-                    } else {
-                        toast(getString(R.string.illegal_login_or_password_label))
+                            setUserAuth(token, this@LoginActivity)
+                            startApp()
+
+                        } else {
+                            toast(R.string.illegal_login_or_password_label)
+                        }
+
+                    } catch (e: Exception) {
+                        toast(R.string.connection_error_label)
+                    } finally {
+                        hideProgress()
                     }
 
                 }

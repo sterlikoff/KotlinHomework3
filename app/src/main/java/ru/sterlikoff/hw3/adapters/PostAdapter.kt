@@ -16,7 +16,6 @@ import ru.sterlikoff.hw3.interfaces.PostEvents
 import ru.sterlikoff.hw3.models.NextButton
 import ru.sterlikoff.hw3.models.Post
 import splitties.exceptions.illegal
-import java.lang.IllegalArgumentException
 
 class PostAdapter(
 
@@ -45,7 +44,6 @@ class PostAdapter(
         val likeBtn: ImageView = itemView.findViewById(R.id.btn_like)
         val locationBtn: ImageView = itemView.findViewById(R.id.btn_location)
         val videoBtn: ImageView = itemView.findViewById(R.id.btn_video)
-        val hideBtn: ImageView = itemView.findViewById(R.id.btn_hide)
         val shareBtn: ImageView = itemView.findViewById(R.id.share_btn)
 
     }
@@ -62,6 +60,11 @@ class PostAdapter(
 
     }
 
+    fun clear() {
+        list.clear()
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
 
         when (viewType) {
@@ -72,43 +75,128 @@ class PostAdapter(
                     parent,
                     false
                 )
+            ).apply {
 
-            )
+                likeBtn.setOnClickListener {
+
+                    val post = list[adapterPosition] as Post
+                    post.like()
+                    notifyItemChanged(adapterPosition, LikeChange(post.likeCount))
+
+                }
+
+                locationBtn.setOnClickListener {
+
+                    val post = list[adapterPosition] as Post
+
+                    context.startActivity(Intent().apply {
+                        action = Intent.ACTION_VIEW
+                        data = Uri.parse("geo:${post.lat},${post.lon}")
+                    })
+
+                }
+
+                videoBtn.setOnClickListener {
+
+                    val post = list[adapterPosition] as Post
+
+                    context.startActivity(Intent().apply {
+                        action = Intent.ACTION_VIEW
+                        data = Uri.parse(post.videoUrl)
+                    })
+
+                }
+
+                itemView.setOnClickListener {
+
+                    val post = list[adapterPosition] as Post
+                    if (post.advertUrl != null) {
+
+                        context.startActivity(Intent().apply {
+                            action = Intent.ACTION_VIEW
+                            data = Uri.parse(post.advertUrl)
+                        })
+
+                    }
+
+                }
+
+                shareBtn.setOnClickListener {
+                    val post = list[adapterPosition] as Post
+                    events.share(post)
+                }
+
+            }
 
             TYPE_NEXT -> NextButtonViewHolder(
+
                 LayoutInflater.from(parent.context).inflate(
                     R.layout.list_item_next,
                     parent,
                     false
                 )
-            )
 
-            else -> throw IllegalArgumentException()
+            ).apply {
+
+                button.setOnClickListener {
+                    list.removeAt(adapterPosition)
+                    events.next()
+                }
+
+            }
+
+            else -> illegal()
 
         }
 
     override fun getItemCount() = list.count()
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) = Unit
 
-        when (holder.itemViewType) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) = when (holder.itemViewType) {
 
-            TYPE_POST -> onBindPost(holder as PostViewHolder, position)
-            TYPE_NEXT -> onBindNext(holder as NextButtonViewHolder, position)
+            TYPE_POST -> onBindPost(holder as PostViewHolder, position, payloads)
+            TYPE_NEXT -> {
+            }
             else -> illegal()
 
         }
 
-    private fun onBindNext(holder: NextButtonViewHolder, position: Int) {
+    private fun renderLikeBtn(isLiked: Boolean, likeCount: Int, holder: PostViewHolder) {
 
-        holder.button.setOnClickListener {
-            list.removeAt(position)
-            events.next()
+        if (likeCount == 0) {
+            holder.likeCount.visibility = View.INVISIBLE
+        } else {
+            holder.likeCount.text = likeCount.toString()
         }
+
+        var colorId = R.color.gray
+        if (isLiked) colorId = R.color.colorAccent
+
+        var imageId = R.drawable.ic_thumb_up_ccc_24dp
+        if (isLiked) imageId = R.drawable.ic_thumb_up_accent_24dp
+
+        holder.likeCount.setTextColor(context.resources.getColor(colorId))
+        holder.likeBtn.setImageDrawable(context.resources.getDrawable(imageId))
 
     }
 
-    private fun onBindPost(holder: PostViewHolder, position: Int) {
+    private fun onBindPost(holder: PostViewHolder, position: Int, payloads: MutableList<Any>) {
+
+        if (payloads.isNotEmpty()) {
+
+            payloads.forEach { change ->
+                if (change is LikeChange) {
+                    renderLikeBtn(true, change.likes, holder)
+                }
+            }
+
+            return
+        }
 
         var post = list[position] as Post
 
@@ -128,23 +216,10 @@ class PostAdapter(
         holder.author.text = post.author
         holder.content.text = post.content
 
-        if (post.likeCount == 0) {
-            holder.likeCount.visibility = View.INVISIBLE
-        } else {
-            holder.likeCount.text = post.likeCount.toString()
-        }
-
         holder.commentCount.text = post.commentCount.toString()
         holder.shareCount.text = post.rePostCount.toString()
 
-        var colorId = R.color.gray;
-        if (post.isLiked()) colorId = R.color.colorAccent
-
-        var imageId = R.drawable.ic_thumb_up_ccc_24dp
-        if (post.isLiked()) imageId = R.drawable.ic_thumb_up_accent_24dp
-
-        holder.likeCount.setTextColor(context.resources.getColor(colorId))
-        holder.likeBtn.setImageDrawable(context.resources.getDrawable(imageId))
+        renderLikeBtn(post.isLiked(), post.likeCount, holder)
 
         if (post.lon !== null && post.lat !== null) {
             holder.locationBtn.visibility = View.VISIBLE
@@ -153,56 +228,6 @@ class PostAdapter(
         if (post.videoUrl !== null) {
             holder.videoBtn.visibility = View.VISIBLE
         }
-
-        holder.likeBtn.setOnClickListener {
-
-            post.like()
-            notifyDataSetChanged()
-
-        }
-
-        holder.locationBtn.setOnClickListener {
-
-            context.startActivity(Intent().apply {
-                action = Intent.ACTION_VIEW
-                data = Uri.parse("geo:${post.lat},${post.lon}")
-            })
-
-        }
-
-        holder.videoBtn.setOnClickListener {
-
-            context.startActivity(Intent().apply {
-                action = Intent.ACTION_VIEW
-                data = Uri.parse(post.videoUrl)
-            })
-
-        }
-
-        holder.hideBtn.setOnClickListener {
-
-            list.remove(post)
-            notifyDataSetChanged()
-
-        }
-
-        if (post.advertUrl !== null) {
-
-            holder.itemView.setOnClickListener {
-
-                context.startActivity(Intent().apply {
-                    action = Intent.ACTION_VIEW
-                    data = Uri.parse(post.advertUrl)
-                })
-
-            }
-
-        }
-
-        holder.shareBtn.setOnClickListener {
-            events.share(post)
-        }
-
 
     }
 
@@ -220,5 +245,7 @@ class PostAdapter(
         private const val TYPE_POST = 1
         private const val TYPE_NEXT = 2
     }
+
+    private data class LikeChange(val likes: Int)
 
 }

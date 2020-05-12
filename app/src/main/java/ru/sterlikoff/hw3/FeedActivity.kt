@@ -8,7 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_feed.*
 import kotlinx.coroutines.launch
 import ru.sterlikoff.hw3.adapters.PostAdapter
 import ru.sterlikoff.hw3.components.Repository
@@ -17,7 +17,7 @@ import ru.sterlikoff.hw3.interfaces.PostEvents
 import ru.sterlikoff.hw3.models.Post
 import splitties.toast.toast
 
-class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
+class FeedActivity : AppCompatActivity(R.layout.activity_feed), ActivityUI {
 
     override var dialog: ProgressDialog? = null
 
@@ -30,18 +30,20 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
 
             lifecycleScope.launch {
 
-                showProgress(this@MainActivity)
-                val result = Repository.share(post.id)
-                hideProgress()
+                showProgress(this@FeedActivity)
 
-                if (result.isSuccessful) {
+                try {
 
-                    fetch()
+                    if (Repository.share(post.id).isSuccessful) {
+                        reset()
+                    } else {
+                        toast(getString(R.string.share_post_error_label))
+                    }
 
-                } else {
-
-                    toast(getString(R.string.share_post_error_label))
-
+                } catch (e: Exception) {
+                    toast(R.string.connection_error_label)
+                } finally {
+                    hideProgress()
                 }
 
             }
@@ -59,46 +61,56 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
 
     private val postAdapter: PostAdapter = PostAdapter(mutableListOf(), this, postEvents)
 
+    private fun reset() {
+
+        offset = 0
+        postAdapter.clear()
+        fetch()
+
+    }
+
     private fun fetch() {
 
         lifecycleScope.launch {
 
-            showProgress(this@MainActivity)
-            val result = Repository.getPosts(limit, offset)
-            hideProgress()
+            showProgress(this@FeedActivity)
 
-            if (result.isSuccessful) {
+            try {
 
-                val list = result.body()?.map {
-                    Post.fromInDto(it) as Item
-                }?.toList() ?: throw Exception("Server returned empty body")
+                val result = Repository.getPosts(limit, offset)
+                swipe.isRefreshing = false
 
-                postAdapter.add(list)
+                if (result.isSuccessful) {
 
-            } else {
+                    val list = result.body()?.map {
+                        Post.fromInDto(it) as Item
+                    }?.toList() ?: throw Exception("Server returned empty body")
 
-                if (result.code() == 401) {
-
-                    logout(this@MainActivity)
-                    startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-                    finish()
+                    postAdapter.add(list)
 
                 } else {
 
-                    toast(getString(R.string.loading_data_error_label) + result.code())
+                    if (result.code() == 401) {
+
+                        logout(this@FeedActivity)
+                        startActivity(Intent(this@FeedActivity, LoginActivity::class.java))
+                        finish()
+
+                    } else {
+
+                        toast(getString(R.string.loading_data_error_label) + result.code())
+
+                    }
 
                 }
 
+            } catch (e: Exception) {
+                toast(getString(R.string.connection_error_label))
+            } finally {
+                hideProgress()
             }
 
         }
-
-    }
-
-    override fun onStart() {
-
-        super.onStart()
-        fetch()
 
     }
 
@@ -109,6 +121,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), ActivityUI {
         itemList.adapter = postAdapter
 
         supportActionBar?.title = "Лента"
+
+        swipe.setOnRefreshListener {
+            reset()
+        }
+
+        fetch()
 
     }
 

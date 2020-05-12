@@ -17,9 +17,9 @@ class PostActivity : AppCompatActivity(R.layout.activity_post), ActivityUI {
 
     override var dialog: ProgressDialog? = null
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
 
-        super.onCreate(savedInstanceState, persistentState)
+        super.onCreate(savedInstanceState)
         supportActionBar?.title = "Новый пост"
 
     }
@@ -33,26 +33,28 @@ class PostActivity : AppCompatActivity(R.layout.activity_post), ActivityUI {
 
     private fun savePost() = lifecycleScope.launch {
 
-            val post = PostOutDto(
-                editTitle.text.toString(),
-                editText.text.toString()
-            )
+        val post = PostOutDto(
+            editTitle.text.toString(),
+            editText.text.toString()
+        )
 
-            showProgress(this@PostActivity)
-            val response = Repository.addPost(post)
-            hideProgress()
+        showProgress(this@PostActivity)
 
-            if (response.isSuccessful) {
+        try {
 
+            if (Repository.addPost(post).isSuccessful) {
                 finish()
-
             } else {
-
                 toast(R.string.error_label)
-
             }
 
+        } catch (e: Exception) {
+            toast(R.string.connection_error_label)
+        } finally {
+            hideProgress()
         }
+
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {

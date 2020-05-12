@@ -20,6 +20,7 @@
     <string name="post_text_label">Текст поста</string>
     <string name="share_post_error_label">При публикации поста произошла ошибка</string>
     <string name="next_label">Следующие</string>
+    <string name="connection_error_label">Ошибка соединения</string>
 
     <plurals name="minute_plural">
 

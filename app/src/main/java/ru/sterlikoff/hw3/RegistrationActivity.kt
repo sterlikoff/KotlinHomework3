@@ -33,13 +33,19 @@ class RegistrationActivity : AppCompatActivity(R.layout.activity_registration), 
                 lifecycleScope.launch {
 
                     showProgress(this@RegistrationActivity)
-                    val response = Repository.registration(registrationRequest)
-                    hideProgress()
 
-                    if (response.isSuccessful) {
-                        finish()
-                    } else {
-                        toast(getString(R.string.error_label))
+                    try {
+
+                        if (Repository.registration(registrationRequest).isSuccessful) {
+                            finish()
+                        } else {
+                            toast(getString(R.string.error_label))
+                        }
+
+                    } catch (e: Exception) {
+                        toast(R.string.connection_error_label)
+                    } finally {
+                        hideProgress()
                     }
 
                 }
